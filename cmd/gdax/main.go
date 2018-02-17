@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/LAtanassov/godax/pkg/gdax"
 	"github.com/gorilla/websocket"
 )
 
@@ -25,13 +26,26 @@ func main() {
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
+
+		c.WriteJSON(gdax.Subscribe{Type: "subscribe", ProductIds: []string{"ETH-USD"}})
+
+		var s gdax.Subscription
+		err = c.ReadJSON(&s)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		log.Println("recv:", s)
+
 		for {
-			_, m, err := c.ReadMessage()
+			var o gdax.OrderEvent
+			err = c.ReadJSON(&o)
 			if err != nil {
-				log.Println("could not read message from websocket", err)
+				log.Println(err)
 				return
 			}
-			log.Println("recv:", m) // debug
+
+			log.Println("recv:", o)
 		}
 	}()
 
