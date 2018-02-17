@@ -19,7 +19,7 @@ SRC = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 all: check install
 
 $(TARGET): $(SRC)
-	@go build $(LDFLAGS) -o $(TARGET)
+	@go build $(LDFLAGS) -o $(TARGET) $(SRC)
 
 build: $(TARGET)
 	@true
@@ -28,4 +28,4 @@ clean:
 	@rm -f $(TARGET)
 
 install:
-	@go install $(LDFLAGS)
+	@go install $(LDFLAGS) -o $(TARGET) $(SRC) 
