@@ -28,4 +28,4 @@ clean:
 	@rm -f $(TARGET)
 
 install:
-	@go install $(LDFLAGS) -o $(TARGET) $(SRC) 
+	@go install $(LDFLAGS) $(SRC) 
