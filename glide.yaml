@@ -1,0 +1,3 @@
+package: github.com/LAtanassov/godax
+import:
+- package: github.com/gorilla/websocket

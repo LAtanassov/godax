@@ -1,0 +1,6 @@
+hash: 6bf632d746e215bec6f446e5f5cdd169ddbf40dc638bdfaa8c39c30e0c968d13
+updated: 2018-02-17T20:57:55.627514315+01:00
+imports:
+- name: github.com/gorilla/websocket
+  version: 4ac909741dfa57448bfadfdbca0cf7eeaa68f0e2
+testImports: []
