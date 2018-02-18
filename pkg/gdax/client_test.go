@@ -1,6 +1,7 @@
 package gdax
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -27,18 +28,16 @@ func TestClientLifecycle(t *testing.T) {
 				conn.Close()
 			}()
 			for {
-				messageType, message, err := conn.ReadMessage()
+				_, message, err := conn.ReadMessage()
 				if err != nil {
 					fmt.Println(err)
-					if messageType != websocket.CloseNormalClosure {
-						t.Fail()
-					}
 				}
 				conn.WriteMessage(websocket.TextMessage, message)
 			}
 		}()
 
 	}))
+	defer srv.Close()
 
 	u, _ := url.Parse(srv.URL)
 	u.Scheme = "ws"
@@ -53,6 +52,30 @@ func TestClientLifecycle(t *testing.T) {
 		t.Fail()
 	}
 	err = cli.Disconnect()
+	if err != nil {
+		t.Fail()
+	}
+}
+
+func TestSnapshot(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		b := BookSnapshot{
+			Sequence: "1",
+			Bids:     []Order{},
+			Asks:     []Order{},
+		}
+
+		m, err := json.Marshal(b)
+		if err != nil {
+			t.Fail()
+		}
+		w.Write(m)
+	}))
+	defer srv.Close()
+
+	u, _ := url.Parse(srv.URL)
+
+	_, err := Snapshot(u)
 	if err != nil {
 		t.Fail()
 	}

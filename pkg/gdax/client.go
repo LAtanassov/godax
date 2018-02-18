@@ -1,6 +1,8 @@
 package gdax
 
 import (
+	"encoding/json"
+	"net/http"
 	"net/url"
 
 	"github.com/go-kit/kit/log"
@@ -93,10 +95,36 @@ func (c *client) Subscribe(p []ProductID) (<-chan OrderEvent, error) {
 			err := c.conn.ReadJSON(&o)
 			if err != nil {
 				c.logger.Log(err)
+				c.logger.Log("closing subscription")
+				close(oc)
 				return
 			}
 			oc <- o
 		}
 	}()
 	return oc, nil
+}
+
+// Snapshot returns a BookSnapshot.
+func Snapshot(u *url.URL) (*BookSnapshot, error) {
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var s BookSnapshot
+	// Use json.Decode for reading streams of JSON data
+	if err := json.NewDecoder(resp.Body).Decode(&s); err != nil {
+		return nil, err
+	}
+
+	return &s, nil
 }
