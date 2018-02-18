@@ -1,6 +1,16 @@
 hash: 6bf632d746e215bec6f446e5f5cdd169ddbf40dc638bdfaa8c39c30e0c968d13
-updated: 2018-02-17T20:57:55.627514315+01:00
+updated: 2018-02-18T13:36:57.303632127+01:00
 imports:
+- name: github.com/go-kit/kit
+  version: 286fe7a0709da897bcafd638ca80289af53d40af
+  subpackages:
+  - log
+- name: github.com/go-logfmt/logfmt
+  version: 390ab7935ee28ec6b286364bba9b4dd6410cb3d5
+- name: github.com/go-stack/stack
+  version: 259ab82a6cad3992b4e21ff5cac294ccb06474bc
 - name: github.com/gorilla/websocket
   version: 4ac909741dfa57448bfadfdbca0cf7eeaa68f0e2
+- name: github.com/kr/logfmt
+  version: b84e30acd515aadc4b783ad4ff83aff3299bdfe0
 testImports: []

@@ -4,16 +4,13 @@ import (
 	"time"
 )
 
-// The Subscribe type represents a request to which product ids you want to subscibe.
-type Subscribe struct {
-	Type       string   `json:"type"`
-	ProductIds []string `json:"product_ids"`
-}
+// ProductID represents exchange product types from GDAX
+type ProductID string
 
-// The Subscription type represents a subscription.
-type Subscription struct {
-	Type string `json:"type"`
-}
+const (
+	// EthUsd represent the exchange product from Ethereum to US Dollar
+	EthUsd ProductID = "ETH-USD"
+)
 
 // The OrderEvent type represents an order event.
 type OrderEvent struct {
