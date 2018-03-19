@@ -2,6 +2,7 @@ package gdax
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/url"
 
@@ -9,16 +10,10 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// The Subscribe type represents a request to which product ids you want to subscibe.
-type Subscribe struct {
-	Type       string      `json:"type"`
-	ProductIds []ProductID `json:"product_ids"`
-}
-
-// The Subscription type represents a subscription.
-type Subscription struct {
-	Type string `json:"type"`
-}
+var (
+	// ErrNotConnected will be returned when a method was called that required a the client to be connected first
+	ErrNotConnected = errors.New("need to connect first")
+)
 
 // Client interface to consume GDAX API.
 type Client interface {
@@ -29,16 +24,7 @@ type Client interface {
 	WithLogger(l log.Logger)
 }
 
-type client struct {
-	uri        *url.URL
-	productIDs []ProductID
-
-	dialer *websocket.Dialer
-	logger log.Logger
-	conn   *websocket.Conn
-}
-
-// NewClient return a new GDAX client for real time order events
+// NewClient return a new GDAX client to subscribe for real time order events
 func NewClient(d *websocket.Dialer) Client {
 	return &client{
 		dialer: d,
@@ -46,6 +32,7 @@ func NewClient(d *websocket.Dialer) Client {
 	}
 }
 
+// WithLogger assigns a Logger
 func (c *client) WithLogger(l log.Logger) {
 	c.logger = l
 }
@@ -65,6 +52,10 @@ func (c *client) Connect(u *url.URL) error {
 
 // Disconnect by sending a close message via websocket and afterwards closing the websocket connection.
 func (c *client) Disconnect() error {
+	if c.conn == nil {
+		return ErrNotConnected
+	}
+
 	defer c.conn.Close()
 
 	err := c.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
@@ -78,12 +69,15 @@ func (c *client) Disconnect() error {
 // In case the subscribe request fail Subscribe will return an error.
 // An unexpected message will not cancel the subscription or connection and will be logged.
 func (c *client) Subscribe(p []ProductID) (<-chan OrderEvent, error) {
+	if c.conn == nil {
+		return nil, ErrNotConnected
+	}
+
 	c.productIDs = p
 	oc := make(chan OrderEvent, 2048)
+	c.conn.WriteJSON(subscribe{Type: "subscribe", ProductIds: []ProductID{EthUsd}})
 
-	c.conn.WriteJSON(Subscribe{Type: "subscribe", ProductIds: []ProductID{EthUsd}})
-
-	var s Subscription
+	var s subscription
 	err := c.conn.ReadJSON(&s)
 	if err != nil {
 		return nil, err
@@ -127,4 +121,24 @@ func Snapshot(u *url.URL) (*BookSnapshot, error) {
 	}
 
 	return &s, nil
+}
+
+// subscribe represents a request with the ProductIds that you want to subscibe to.
+type subscribe struct {
+	Type       string      `json:"type"`
+	ProductIds []ProductID `json:"product_ids"`
+}
+
+// subscription represents a subscription.
+type subscription struct {
+	Type string `json:"type"`
+}
+
+type client struct {
+	uri        *url.URL
+	productIDs []ProductID
+
+	dialer *websocket.Dialer
+	logger log.Logger
+	conn   *websocket.Conn
 }

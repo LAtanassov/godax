@@ -22,15 +22,14 @@ func main() {
 	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 
-	c := gdax.NewClient(websocket.DefaultDialer)
-	c.WithLogger(logger)
-
 	u, err := url.Parse(*feedURI)
 	if err != nil {
 		logger.Log("could not parse feed uri", err)
 		return
 	}
 
+	c := gdax.NewClient(websocket.DefaultDialer)
+	c.WithLogger(logger)
 	err = c.Connect(u)
 	if err != nil {
 		logger.Log("could not connect to gdax.", err)
