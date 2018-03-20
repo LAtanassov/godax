@@ -27,14 +27,15 @@ type OrderEvent struct {
 
 // BookSnapshot represents a snapshot of the current GDAX order book.
 type BookSnapshot struct {
-	Sequence string  `json:"sequence"`
-	Bids     []Order `json:"bids"`
-	Asks     []Order `json:"asks"`
+	Sequence int `json:"sequence"`
+	// TODO: [][] string should be Order
+	Bids [][]string `json:"bids"`
+	Asks [][]string `json:"asks"`
 }
 
 // Order represents a order.
 type Order struct {
-	Price     string
-	Size      string
-	NumOrders uint64
+	Price   string
+	Size    string
+	OrderID string
 }
