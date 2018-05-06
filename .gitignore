@@ -16,3 +16,5 @@ vendor/
 
 # vs code project files
 .vscode/
+
+*secret*

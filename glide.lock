@@ -1,16 +1,64 @@
 hash: 6bf632d746e215bec6f446e5f5cdd169ddbf40dc638bdfaa8c39c30e0c968d13
-updated: 2018-02-18T13:36:57.303632127+01:00
+updated: 2018-03-24T16:55:22.334746112+01:00
 imports:
-- name: github.com/go-kit/kit
-  version: 286fe7a0709da897bcafd638ca80289af53d40af
+- name: github.com/altairsix/eventsource
+  version: 7b6859b7a00908296beea99d5d2800b6c071c084
   subpackages:
+  - mysqlstore
+- name: github.com/beorn7/perks
+  version: 3a771d992973f24aa725d07868b467d1ddfceafb
+  subpackages:
+  - quantile
+- name: github.com/go-kit/kit
+  version: 618005da878c6f91827bd66bd1189403495df76f
+  subpackages:
+  - endpoint
   - log
+  - metrics
+  - metrics/internal/lv
+  - metrics/prometheus
+  - transport/http
 - name: github.com/go-logfmt/logfmt
   version: 390ab7935ee28ec6b286364bba9b4dd6410cb3d5
 - name: github.com/go-stack/stack
   version: 259ab82a6cad3992b4e21ff5cac294ccb06474bc
+- name: github.com/golang/protobuf
+  version: bbd03ef6da3a115852eaf24c8a1c46aeb39aa175
+  subpackages:
+  - proto
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/mux
+  version: 4dbd923b0c9e99ff63ad54b0e9705ff92d3cdb06
 - name: github.com/gorilla/websocket
-  version: 4ac909741dfa57448bfadfdbca0cf7eeaa68f0e2
+  version: eb925808374e5ca90c83401a40d711dc08c0c0f6
 - name: github.com/kr/logfmt
   version: b84e30acd515aadc4b783ad4ff83aff3299bdfe0
+- name: github.com/matttproud/golang_protobuf_extensions
+  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
+  subpackages:
+  - pbutil
+- name: github.com/pkg/errors
+  version: 816c9085562cd7ee03e7f8188a1cfd942858cded
+- name: github.com/prometheus/client_golang
+  version: d49167c4b9f3c4451707560c5c71471ff5291aaa
+  subpackages:
+  - prometheus
+  - prometheus/promhttp
+- name: github.com/prometheus/client_model
+  version: 99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c
+  subpackages:
+  - go
+- name: github.com/prometheus/common
+  version: e4aa40a9169a88835b849a6efb71e05dc04b88f0
+  subpackages:
+  - expfmt
+  - internal/bitbucket.org/ww/goautoneg
+  - model
+- name: github.com/prometheus/procfs
+  version: 780932d4fbbe0e69b84c34c20f5c8d0981e109ea
+  subpackages:
+  - internal/util
+  - nfs
+  - xfs
 testImports: []
