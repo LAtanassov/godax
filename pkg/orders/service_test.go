@@ -15,9 +15,6 @@ func Test_service_CreateOrder(t *testing.T) {
 		idGenerator Generator
 		repository  Repository
 	}
-	type args struct {
-		ctx context.Context
-	}
 	tests := []struct {
 		name    string
 		fields  fields
@@ -105,9 +102,6 @@ func Test_service_CancelOrder(t *testing.T) {
 	type fields struct {
 		idGenerator Generator
 		repository  Repository
-	}
-	type args struct {
-		ctx context.Context
 	}
 	tests := []struct {
 		name    string

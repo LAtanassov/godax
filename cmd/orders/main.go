@@ -26,12 +26,12 @@ func main() {
 
 	var (
 		envHTTPAddr  = envString("HTTP_ADDR", ":8080")
-		envSQLDriver = envString("SQL_DRIVER", "inmem")
+		envSQLDriver = envString("SQL_DRIVER", inmem)
 		envSQLUser   = envString("SQL_USER", "")
 		envSQLPwd    = envString("SQL_PASSWORD", "")
 		envSQLHost   = envString("SQL_HOST", "")
 		envSQLDbName = envString("SQL_DB_NAME", "godax")
-		envTabName   = envString("SQL_DB_NAME", "orders")
+		envTabName   = envString("SQL_DB_NAME", tableName)
 
 		httpAddr = flag.String("http.addr", envHTTPAddr, "HTTP listen address")
 		// TODO: should be a struct
@@ -45,8 +45,7 @@ func main() {
 
 	flag.Parse()
 
-	var logger kitlog.Logger
-	logger = kitlog.NewLogfmtLogger(kitlog.NewSyncWriter(os.Stderr))
+	logger := kitlog.NewLogfmtLogger(kitlog.NewSyncWriter(os.Stderr))
 	logger = kitlog.With(logger, "ts", kitlog.DefaultTimestampUTC)
 
 	repo, err := orders.NewRepository(*sqlDriver, *sqlHost, *sqlDbName, *sqlUser, *sqlPwd, *tableName)
@@ -57,8 +56,7 @@ func main() {
 
 	fieldKeys := []string{"method"}
 
-	var o orders.Service
-	o = orders.NewService(idg, repo)
+	o := orders.NewService(idg, repo)
 	o = orders.NewLoggingService(kitlog.With(logger, "component", "orders"), o)
 	o = orders.NewInstrumentingService(
 		kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
@@ -92,7 +90,7 @@ func main() {
 		errs <- http.ListenAndServe(*httpAddr, nil)
 	}()
 	go func() {
-		c := make(chan os.Signal)
+		c := make(chan os.Signal, 1)
 		signal.Notify(c, syscall.SIGINT)
 		errs <- fmt.Errorf("%s", <-c)
 	}()

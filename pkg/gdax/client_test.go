@@ -55,9 +55,9 @@ func TestDisconnectBeforeConnect(t *testing.T) {
 func TestSnapshot(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		b := BookSnapshot{
-			Sequence: "1",
-			Bids:     []Order{},
-			Asks:     []Order{},
+			Sequence: 1,
+			Bids:     [][]string{},
+			Asks:     [][]string{},
 		}
 
 		m, err := json.Marshal(b)

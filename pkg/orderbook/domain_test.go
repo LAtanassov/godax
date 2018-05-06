@@ -9,16 +9,6 @@ import (
 )
 
 func TestOrder_On(t *testing.T) {
-	type fields struct {
-		Size      float32
-		Price     float32
-		OrderType OrderType
-		OrderSide OrderSide
-		ProductID ProductID
-	}
-	type args struct {
-		event eventsource.Event
-	}
 	tests := []struct {
 		name      string
 		order     Order
@@ -26,33 +16,33 @@ func TestOrder_On(t *testing.T) {
 		wantState string
 		wantErr   bool
 	}{
-		{"should set StateCreated", Order{}, &OrderCreated{
+		{"should set stateCreated", Order{}, &OrderCreated{
 			Model: eventsource.Model{ID: "", Version: 1, At: time.Now()},
-		}, StateCreated, false},
-		{"should set StateAccepted", Order{}, &OrderAccepted{
+		}, stateCreated, false},
+		{"should set stateAccepted", Order{}, &OrderAccepted{
 			Model: eventsource.Model{ID: "", Version: 1, At: time.Now()},
-		}, StateAccepted, false},
-		{"should set StateCanceled", Order{}, &OrderCanceled{
+		}, stateAccepted, false},
+		{"should set stateCanceled", Order{}, &OrderCanceled{
 			Model: eventsource.Model{ID: "", Version: 1, At: time.Now()},
-		}, StateCanceled, false},
-		{"should set StatePublished", Order{}, &OrderPublished{
+		}, stateCanceled, false},
+		{"should set statePublished", Order{}, &OrderPublished{
 			Model: eventsource.Model{ID: "", Version: 1, At: time.Now()},
-		}, StatePublished, false},
-		{"should set StateMatched", Order{}, &OrderMatched{
+		}, statePublished, false},
+		{"should set stateMatched", Order{}, &OrderMatched{
 			Model: eventsource.Model{ID: "", Version: 1, At: time.Now()},
-		}, StateMatched, false},
-		{"should set StateConfirmed", Order{}, &OrderConfirmed{
+		}, stateMatched, false},
+		{"should set stateConfirmed", Order{}, &OrderConfirmed{
 			Model: eventsource.Model{ID: "", Version: 1, At: time.Now()},
-		}, StateConfirmed, false},
-		{"should set StateCleared", Order{}, &OrderCleared{
+		}, stateConfirmed, false},
+		{"should set stateCleared", Order{}, &OrderCleared{
 			Model: eventsource.Model{ID: "", Version: 1, At: time.Now()},
-		}, StateCleared, false},
-		{"should set StateSettled", Order{}, &OrderSettled{
+		}, stateCleared, false},
+		{"should set stateSettled", Order{}, &OrderSettled{
 			Model: eventsource.Model{ID: "", Version: 1, At: time.Now()},
-		}, StateSettled, false},
+		}, stateSettled, false},
 		{"should return erro if unknown model", Order{}, &UnknownModel{
 			Model: eventsource.Model{ID: "", Version: 1, At: time.Now()},
-		}, StateSettled, true},
+		}, stateSettled, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -98,96 +88,96 @@ func TestOrder_Apply(t *testing.T) {
 				Model: eventsource.Model{ID: "1", Version: 1, At: time.Now()},
 			}}, false, nil},
 
-		{"should return OrderAccepted Event for AcceptOrder command", Order{version: 0, state: StateCreated},
+		{"should return OrderAccepted Event for AcceptOrder command", Order{version: 0, state: stateCreated},
 			args{context.Background(), &AcceptOrder{
 				CommandModel: eventsource.CommandModel{ID: "1"},
 			}},
 			[]eventsource.Event{OrderAccepted{
 				Model: eventsource.Model{ID: "1", Version: 1, At: time.Now()},
 			}}, false, nil},
-		{"should return ErrOrderNotCreated for AcceptOrder command with an Order with not StateCreated", Order{version: 0, state: StateAccepted},
+		{"should return ErrInvalidStateTransition for AcceptOrder command with an Order with not stateCreated", Order{version: 0, state: stateAccepted},
 			args{context.Background(), &AcceptOrder{
 				CommandModel: eventsource.CommandModel{ID: "1"},
 			}},
-			[]eventsource.Event{}, true, ErrOrderNotCreated},
+			[]eventsource.Event{}, true, ErrInvalidStateTransition},
 
-		{"should return OrderCanceled Event for CancelOrder command", Order{version: 0, state: StateCreated},
+		{"should return OrderCanceled Event for CancelOrder command", Order{version: 0, state: stateCreated},
 			args{context.Background(), &CancelOrder{
 				CommandModel: eventsource.CommandModel{ID: "1"},
 			}},
 			[]eventsource.Event{OrderCanceled{
 				Model: eventsource.Model{ID: "1", Version: 1, At: time.Now()},
 			}}, false, nil},
-		{"should return ErrOrderNotCreated for CancelOrder command with an Order with not StateCreated", Order{version: 0, state: StateAccepted},
+		{"should return ErrInvalidStateTransition for CancelOrder command with an Order with not stateCreated", Order{version: 0, state: stateAccepted},
 			args{context.Background(), &CancelOrder{
 				CommandModel: eventsource.CommandModel{ID: "1"},
 			}},
-			[]eventsource.Event{}, true, ErrOrderNotCreated},
+			[]eventsource.Event{}, true, ErrInvalidStateTransition},
 
-		{"should return OrderPublished Event for PublishOrder command", Order{version: 0, state: StateAccepted},
+		{"should return OrderPublished Event for PublishOrder command", Order{version: 0, state: stateAccepted},
 			args{context.Background(), &PublishOrder{
 				CommandModel: eventsource.CommandModel{ID: "1"},
 			}},
 			[]eventsource.Event{OrderPublished{
 				Model: eventsource.Model{ID: "1", Version: 1, At: time.Now()},
 			}}, false, nil},
-		{"should return ErrOrderNotAccepted for PublishOrder command with an Order with not StateAccepted", Order{version: 0, state: StateCreated},
+		{"should return ErrInvalidStateTransition for PublishOrder command with an Order with not stateAccepted", Order{version: 0, state: stateCreated},
 			args{context.Background(), &PublishOrder{
 				CommandModel: eventsource.CommandModel{ID: "1"},
 			}},
-			[]eventsource.Event{}, true, ErrOrderNotAccepted},
+			[]eventsource.Event{}, true, ErrInvalidStateTransition},
 
-		{"should return OrderMatched Event for MatchOrder command", Order{version: 0, state: StatePublished},
+		{"should return OrderMatched Event for MatchOrder command", Order{version: 0, state: statePublished},
 			args{context.Background(), &MatchOrder{
 				CommandModel: eventsource.CommandModel{ID: "1"},
 			}},
 			[]eventsource.Event{OrderMatched{
 				Model: eventsource.Model{ID: "1", Version: 1, At: time.Now()},
 			}}, false, nil},
-		{"should return ErrOrderNotPublished for MatchOrder command with an Order with not StatePublished", Order{version: 0, state: StateAccepted},
+		{"should return ErrInvalidStateTransition for MatchOrder command with an Order with not statePublished", Order{version: 0, state: stateAccepted},
 			args{context.Background(), &MatchOrder{
 				CommandModel: eventsource.CommandModel{ID: "1"},
 			}},
-			[]eventsource.Event{}, true, ErrOrderNotPublished},
+			[]eventsource.Event{}, true, ErrInvalidStateTransition},
 
-		{"should return OrderConfirmed Event for ConfirmOrder command", Order{version: 0, state: StateMatched},
+		{"should return OrderConfirmed Event for ConfirmOrder command", Order{version: 0, state: stateMatched},
 			args{context.Background(), &ConfirmOrder{
 				CommandModel: eventsource.CommandModel{ID: "1"},
 			}},
 			[]eventsource.Event{OrderConfirmed{
 				Model: eventsource.Model{ID: "1", Version: 1, At: time.Now()},
 			}}, false, nil},
-		{"should return ErrOrderNotMatched for ConfirmOrder command with an Order with not StateMatched", Order{version: 0, state: StateCreated},
+		{"should return ErrInvalidStateTransition for ConfirmOrder command with an Order with not stateMatched", Order{version: 0, state: stateCreated},
 			args{context.Background(), &ConfirmOrder{
 				CommandModel: eventsource.CommandModel{ID: "1"},
 			}},
-			[]eventsource.Event{}, true, ErrOrderNotMatched},
+			[]eventsource.Event{}, true, ErrInvalidStateTransition},
 
-		{"should return OrderCleared Event for ClearOrder command", Order{version: 0, state: StateConfirmed},
+		{"should return OrderCleared Event for ClearOrder command", Order{version: 0, state: stateConfirmed},
 			args{context.Background(), &ClearOrder{
 				CommandModel: eventsource.CommandModel{ID: "1"},
 			}},
 			[]eventsource.Event{OrderCleared{
 				Model: eventsource.Model{ID: "1", Version: 1, At: time.Now()},
 			}}, false, nil},
-		{"should return ErrOrderNotConfirmed for ClearOrder command with an Order with not StateConfirmed", Order{version: 0, state: StateCreated},
+		{"should return ErrInvalidStateTransition for ClearOrder command with an Order with not stateConfirmed", Order{version: 0, state: stateCreated},
 			args{context.Background(), &ClearOrder{
 				CommandModel: eventsource.CommandModel{ID: "1"},
 			}},
-			[]eventsource.Event{}, true, ErrOrderNotConfirmed},
+			[]eventsource.Event{}, true, ErrInvalidStateTransition},
 
-		{"should return OrderSettled Event for SettleOrder command", Order{version: 0, state: StateCleared},
+		{"should return OrderSettled Event for SettleOrder command", Order{version: 0, state: stateCleared},
 			args{context.Background(), &SettleOrder{
 				CommandModel: eventsource.CommandModel{ID: "1"},
 			}},
 			[]eventsource.Event{OrderSettled{
 				Model: eventsource.Model{ID: "1", Version: 1, At: time.Now()},
 			}}, false, nil},
-		{"should return ErrOrderNotCleared for SettleOrder command with an Order with not StateCleared", Order{version: 0, state: StateCreated},
+		{"should return ErrInvalidStateTransition for SettleOrder command with an Order with not stateCleared", Order{version: 0, state: stateCreated},
 			args{context.Background(), &SettleOrder{
 				CommandModel: eventsource.CommandModel{ID: "1"},
 			}},
-			[]eventsource.Event{}, true, ErrOrderNotCleared},
+			[]eventsource.Event{}, true, ErrInvalidStateTransition},
 
 		{"should return ErrUnknownCommand", Order{},
 			args{context.Background(), eventsource.CommandModel{ID: "1"}},

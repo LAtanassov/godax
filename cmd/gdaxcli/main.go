@@ -2,12 +2,15 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"log"
 	"net/url"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/LAtanassov/godax/pkg/gdax"
-	"github.com/go-kit/kit/log"
+	kitlog "github.com/go-kit/kit/log"
 	"github.com/gorilla/websocket"
 )
 
@@ -18,9 +21,8 @@ func main() {
 
 	flag.Parse()
 
-	var logger log.Logger
-	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
-	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+	logger := kitlog.NewLogfmtLogger(kitlog.NewSyncWriter(os.Stderr))
+	logger = kitlog.With(logger, "ts", kitlog.DefaultTimestampUTC)
 
 	u, err := url.Parse(*feedURI)
 	if err != nil {
@@ -62,17 +64,13 @@ func main() {
 		}
 	}()
 
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt)
+	errs := make(chan error, 1)
 
-	for {
-		select {
-		case <-interrupt:
-			err := c.Disconnect()
-			if err != nil {
-				logger.Log("could not disconnect.", err)
-			}
-			return
-		}
-	}
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, syscall.SIGINT)
+		errs <- fmt.Errorf("%s", <-c)
+	}()
+
+	log.Fatal("terminated", <-errs)
 }

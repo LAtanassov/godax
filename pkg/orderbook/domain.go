@@ -8,10 +8,13 @@ import (
 	"github.com/altairsix/eventsource"
 )
 
+// OrderType represents an enum of order types
 type OrderType int
 
 const (
+	// Limit order type lets you set your own price
 	Limit OrderType = iota
+	// Market order type will be executed immediately at the current market price
 	Market
 )
 
@@ -26,10 +29,13 @@ func (o OrderType) String() string {
 	return ""
 }
 
+// OrderSide represents an enum of order sides
 type OrderSide int
 
 const (
+	// Sell a specific product
 	Sell OrderSide = iota
+	// Buy a specific product
 	Buy
 )
 
@@ -44,15 +50,17 @@ func (o OrderSide) String() string {
 	return ""
 }
 
+// ProductID represents an enum of product ids
 type ProductID int
 
 const (
-	BTC_USD ProductID = iota
+	// BtcUsd product id represents the market of Bitcoin and US dollar
+	BtcUsd ProductID = iota
 )
 
 func (p ProductID) String() string {
 	switch p {
-	case BTC_USD:
+	case BtcUsd:
 		return "BTC-USD"
 	}
 
@@ -60,26 +68,24 @@ func (p ProductID) String() string {
 }
 
 const (
-	StateCreated   = "created"
-	StateAccepted  = "accepted"
-	StatePublished = "published"
-	StateCanceled  = "canceled"
-	StateMatched   = "matched"
-	StateConfirmed = "confirmed"
-	StateCleared   = "cleared"
-	StateSettled   = "settled"
+	stateCreated   = "created"
+	stateAccepted  = "accepted"
+	statePublished = "published"
+	stateCanceled  = "canceled"
+	stateMatched   = "matched"
+	stateConfirmed = "confirmed"
+	stateCleared   = "cleared"
+	stateSettled   = "settled"
 )
 
 var (
+	// ErrUnknownEvent represents an unknown event
 	ErrUnknownEvent = errors.New("unknown event")
 
-	ErrOrderNotCreated   = errors.New("order not created")
-	ErrOrderNotAccepted  = errors.New("order not accepted")
-	ErrOrderNotPublished = errors.New("order not published")
-	ErrOrderNotMatched   = errors.New("order not matched")
-	ErrOrderNotConfirmed = errors.New("order not confirmed")
-	ErrOrderNotCleared   = errors.New("order not cleared")
-	ErrUnknownCommand    = errors.New("unknown command")
+	// ErrUnknownCommand represents an unknown command
+	ErrUnknownCommand = errors.New("unknown command")
+	// ErrInvalidStateTransition is returned when preconditions are not met
+	ErrInvalidStateTransition = errors.New("invalid state transition")
 )
 
 // Events --------------
@@ -206,21 +212,21 @@ func (o *Order) On(event eventsource.Event) error {
 		o.OrderSide = v.OrderSide
 
 		o.createdAt = v.At
-		o.state = StateCreated
+		o.state = stateCreated
 	case *OrderAccepted:
-		o.state = StateAccepted
+		o.state = stateAccepted
 	case *OrderCanceled:
-		o.state = StateCanceled
+		o.state = stateCanceled
 	case *OrderPublished:
-		o.state = StatePublished
+		o.state = statePublished
 	case *OrderMatched:
-		o.state = StateMatched
+		o.state = stateMatched
 	case *OrderConfirmed:
-		o.state = StateConfirmed
+		o.state = stateConfirmed
 	case *OrderCleared:
-		o.state = StateCleared
+		o.state = stateCleared
 	case *OrderSettled:
-		o.state = StateSettled
+		o.state = stateSettled
 	default:
 		return ErrUnknownEvent
 	}
@@ -241,56 +247,56 @@ func (o *Order) Apply(ctx context.Context, command eventsource.Command) ([]event
 		}
 		return []eventsource.Event{orderCreated}, nil
 	case *AcceptOrder:
-		if o.state != StateCreated {
-			return nil, ErrOrderNotCreated
+		if o.state != stateCreated {
+			return nil, ErrInvalidStateTransition
 		}
 		orderAccepted := &OrderAccepted{
 			Model: eventsource.Model{ID: v.AggregateID(), Version: o.version + 1, At: time.Now()},
 		}
 		return []eventsource.Event{orderAccepted}, nil
 	case *CancelOrder:
-		if o.state != StateCreated {
-			return nil, ErrOrderNotCreated
+		if o.state != stateCreated {
+			return nil, ErrInvalidStateTransition
 		}
 		orderCanceled := &OrderCanceled{
 			Model: eventsource.Model{ID: v.AggregateID(), Version: o.version + 1, At: time.Now()},
 		}
 		return []eventsource.Event{orderCanceled}, nil
 	case *PublishOrder:
-		if o.state != StateAccepted {
-			return nil, ErrOrderNotAccepted
+		if o.state != stateAccepted {
+			return nil, ErrInvalidStateTransition
 		}
 		orderPublished := &OrderPublished{
 			Model: eventsource.Model{ID: v.AggregateID(), Version: o.version + 1, At: time.Now()},
 		}
 		return []eventsource.Event{orderPublished}, nil
 	case *MatchOrder:
-		if o.state != StatePublished {
-			return nil, ErrOrderNotPublished
+		if o.state != statePublished {
+			return nil, ErrInvalidStateTransition
 		}
 		orderMatched := &OrderMatched{
 			Model: eventsource.Model{ID: v.AggregateID(), Version: o.version + 1, At: time.Now()},
 		}
 		return []eventsource.Event{orderMatched}, nil
 	case *ConfirmOrder:
-		if o.state != StateMatched {
-			return nil, ErrOrderNotMatched
+		if o.state != stateMatched {
+			return nil, ErrInvalidStateTransition
 		}
 		orderConfirmed := &OrderConfirmed{
 			Model: eventsource.Model{ID: v.AggregateID(), Version: o.version + 1, At: time.Now()},
 		}
 		return []eventsource.Event{orderConfirmed}, nil
 	case *ClearOrder:
-		if o.state != StateConfirmed {
-			return nil, ErrOrderNotConfirmed
+		if o.state != stateConfirmed {
+			return nil, ErrInvalidStateTransition
 		}
 		orderCleared := &OrderCleared{
 			Model: eventsource.Model{ID: v.AggregateID(), Version: o.version + 1, At: time.Now()},
 		}
 		return []eventsource.Event{orderCleared}, nil
 	case *SettleOrder:
-		if o.state != StateCleared {
-			return nil, ErrOrderNotCleared
+		if o.state != stateCleared {
+			return nil, ErrInvalidStateTransition
 		}
 		orderSettled := &OrderSettled{
 			Model: eventsource.Model{ID: v.AggregateID(), Version: o.version + 1, At: time.Now()},

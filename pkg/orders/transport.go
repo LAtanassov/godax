@@ -155,9 +155,10 @@ var orderSides = map[string]orderbook.OrderSide{
 }
 
 var productIDs = map[string]orderbook.ProductID{
-	orderbook.BTC_USD.String(): orderbook.BTC_USD,
+	orderbook.BtcUsd.String(): orderbook.BtcUsd,
 }
 
+// EPSILON is a small float number
 const EPSILON float32 = 0.00000001
 
 func floatEquals(a, b float32) bool {
