@@ -1,5 +1,5 @@
 # go-gdax
-go gdax - crypto currency trading platform - toy project
+go gdax - crypto currency trading platform - pet project
 
 # Build & Deployment
 
