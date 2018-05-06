@@ -31,7 +31,7 @@ func Test_service_CreateOrder(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := NewService(tt.fields.idGenerator, tt.fields.repository)
-			got, err := s.CreateOrder(tt.ctx, 1.0, 1.0, orderbook.Limit, orderbook.Buy, orderbook.BTC_USD)
+			got, err := s.CreateOrder(tt.ctx, 1.0, 1.0, orderbook.Limit, orderbook.Buy, orderbook.BtcUsd)
 
 			if tt.wantErr && err != nil {
 				return
