@@ -20,6 +20,15 @@ $> kubectl apply -f mysql-deployment.yaml
 $> kubectl apply -f orders-deployment.yaml
 ```
 
+## Risk Monitor
+
+```sh
+$> docker run -it -p 5672:5672 --hostname test-rabbitmq rabbitmq:3.7.4
+
+```
+
 ## TODO
 
 * SECURITY: validation
+
+* FEATURE: not fault-tolerant yet (observers might miss a message)
