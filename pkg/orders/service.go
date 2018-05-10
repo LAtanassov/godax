@@ -22,6 +22,19 @@ type Service interface {
 	GetOrder(ctx context.Context, id string) (orderbook.Order, error)
 	// CancelOrder cancels an existing Order
 	CancelOrder(ctx context.Context, id string) error
+
+	// AcceptOrder accepts an existing Order
+	AcceptOrder(ctx context.Context, id string) error
+	// PublishOrder publish an existing Order
+	PublishOrder(ctx context.Context, id string) error
+	// MatchOrder matches an existing Order
+	MatchOrder(ctx context.Context, id string) error
+	// ConfirmOrder confirms an existing Order
+	ConfirmOrder(ctx context.Context, id string) error
+	// ClearOrder clears an existing Order
+	ClearOrder(ctx context.Context, id string) error
+	// SettleOrder settles an existing Order
+	SettleOrder(ctx context.Context, id string) error
 }
 
 type service struct {
@@ -82,6 +95,90 @@ func (s *service) CancelOrder(ctx context.Context, id string) error {
 	}
 
 	_, err := s.repository.Apply(ctx, cancelOrder)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// AcceptOrder creates a AcceptOrder command and apply it on the Order.
+func (s *service) AcceptOrder(ctx context.Context, id string) error {
+
+	acceptOrder := &orderbook.AcceptOrder{
+		CommandModel: eventsource.CommandModel{ID: id},
+	}
+
+	_, err := s.repository.Apply(ctx, acceptOrder)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// PublishOrder creates a PublishOrder command and apply it on the Order.
+func (s *service) PublishOrder(ctx context.Context, id string) error {
+
+	publishOrder := &orderbook.PublishOrder{
+		CommandModel: eventsource.CommandModel{ID: id},
+	}
+
+	_, err := s.repository.Apply(ctx, publishOrder)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// MatchOrder creates a MatchOrder command and apply it on the Order.
+func (s *service) MatchOrder(ctx context.Context, id string) error {
+
+	matchOrder := &orderbook.MatchOrder{
+		CommandModel: eventsource.CommandModel{ID: id},
+	}
+
+	_, err := s.repository.Apply(ctx, matchOrder)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// ConfirmOrder creates a ConfirmOrder command and apply it on the Order.
+func (s *service) ConfirmOrder(ctx context.Context, id string) error {
+
+	confirmOrder := &orderbook.ConfirmOrder{
+		CommandModel: eventsource.CommandModel{ID: id},
+	}
+
+	_, err := s.repository.Apply(ctx, confirmOrder)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// ClearOrder creates a ClearOrder command and apply it on the Order.
+func (s *service) ClearOrder(ctx context.Context, id string) error {
+
+	clearOrder := &orderbook.ClearOrder{
+		CommandModel: eventsource.CommandModel{ID: id},
+	}
+
+	_, err := s.repository.Apply(ctx, clearOrder)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// SettleOrder creates a SettleOrder command and apply it on the Order.
+func (s *service) SettleOrder(ctx context.Context, id string) error {
+
+	settleOrder := &orderbook.SettleOrder{
+		CommandModel: eventsource.CommandModel{ID: id},
+	}
+
+	_, err := s.repository.Apply(ctx, settleOrder)
 	if err != nil {
 		return err
 	}

@@ -56,23 +56,89 @@ func makeGetOrderEndpoint(s Service) endpoint.Endpoint {
 	}
 }
 
-type cancelOrderRequest struct {
+type commonOrderRequest struct {
 	ID string `json:"id"`
 }
 
-type cancelOrderResponse struct {
+type commonOrderResponse struct {
 	Err error `json:"error,omitempty"`
 }
 
-func (r cancelOrderResponse) error() error { return r.Err }
+func (r commonOrderResponse) error() error { return r.Err }
 
 func makeCancelOrderEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req, ok := request.(cancelOrderRequest)
+		req, ok := request.(commonOrderRequest)
 		if !ok {
 			return nil, ErrTypeCast
 		}
 		err := s.CancelOrder(ctx, req.ID)
-		return cancelOrderResponse{Err: err}, nil
+		return commonOrderResponse{Err: err}, nil
+	}
+}
+
+func makeAcceptOrderEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(commonOrderRequest)
+		if !ok {
+			return nil, ErrTypeCast
+		}
+		err := s.AcceptOrder(ctx, req.ID)
+		return commonOrderResponse{Err: err}, nil
+	}
+}
+
+func makePublishOrderEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(commonOrderRequest)
+		if !ok {
+			return nil, ErrTypeCast
+		}
+		err := s.PublishOrder(ctx, req.ID)
+		return commonOrderResponse{Err: err}, nil
+	}
+}
+
+func makeMatchOrderEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(commonOrderRequest)
+		if !ok {
+			return nil, ErrTypeCast
+		}
+		err := s.MatchOrder(ctx, req.ID)
+		return commonOrderResponse{Err: err}, nil
+	}
+}
+
+func makeConfirmOrderEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(commonOrderRequest)
+		if !ok {
+			return nil, ErrTypeCast
+		}
+		err := s.ConfirmOrder(ctx, req.ID)
+		return commonOrderResponse{Err: err}, nil
+	}
+}
+
+func makeClearOrderEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(commonOrderRequest)
+		if !ok {
+			return nil, ErrTypeCast
+		}
+		err := s.ClearOrder(ctx, req.ID)
+		return commonOrderResponse{Err: err}, nil
+	}
+}
+
+func makeSettleOrderEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req, ok := request.(commonOrderRequest)
+		if !ok {
+			return nil, ErrTypeCast
+		}
+		err := s.SettleOrder(ctx, req.ID)
+		return commonOrderResponse{Err: err}, nil
 	}
 }

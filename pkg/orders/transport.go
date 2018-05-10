@@ -36,7 +36,49 @@ func MakeHandler(s Service, logger kitlog.Logger) http.Handler {
 
 	cancelOrderHandler := kithttp.NewServer(
 		makeCancelOrderEndpoint(s),
-		decodeCancelOrderRequest,
+		decodeCommonOrderRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	acceptOrderHandler := kithttp.NewServer(
+		makeAcceptOrderEndpoint(s),
+		decodeCommonOrderRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	publishOrderHandler := kithttp.NewServer(
+		makePublishOrderEndpoint(s),
+		decodeCommonOrderRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	matchOrderHandler := kithttp.NewServer(
+		makeMatchOrderEndpoint(s),
+		decodeCommonOrderRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	confirmOrderHandler := kithttp.NewServer(
+		makeConfirmOrderEndpoint(s),
+		decodeCommonOrderRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	clearOrderHandler := kithttp.NewServer(
+		makeClearOrderEndpoint(s),
+		decodeCommonOrderRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	settleOrderHandler := kithttp.NewServer(
+		makeSettleOrderEndpoint(s),
+		decodeCommonOrderRequest,
 		encodeResponse,
 		opts...,
 	)
@@ -45,7 +87,14 @@ func MakeHandler(s Service, logger kitlog.Logger) http.Handler {
 
 	r.Handle("/godax/v1/orders", createOrderHandler).Methods("POST")
 	r.Handle("/godax/v1/orders/{id}", getOrderHandler).Methods("GET")
-	r.Handle("/godax/v1//orders/{id}", cancelOrderHandler).Methods("DELETE")
+	r.Handle("/godax/v1/orders/{id}", cancelOrderHandler).Methods("DELETE")
+
+	r.Handle("/godax/v1/orders/{id}/accept", acceptOrderHandler).Methods("PUT")
+	r.Handle("/godax/v1/orders/{id}/publish", publishOrderHandler).Methods("PUT")
+	r.Handle("/godax/v1/orders/{id}/match", matchOrderHandler).Methods("PUT")
+	r.Handle("/godax/v1/orders/{id}/confirm", confirmOrderHandler).Methods("PUT")
+	r.Handle("/godax/v1/orders/{id}/clear", clearOrderHandler).Methods("PUT")
+	r.Handle("/godax/v1/orders/{id}/settle", settleOrderHandler).Methods("PUT")
 
 	return r
 }
@@ -106,13 +155,13 @@ func decodeGetOrderRequest(_ context.Context, r *http.Request) (interface{}, err
 	return getOrderRequest{ID: id}, nil
 }
 
-func decodeCancelOrderRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeCommonOrderRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	vars := mux.Vars(r)
 	id, ok := vars["id"]
 	if !ok {
 		return nil, errBadRoute
 	}
-	return getOrderRequest{ID: id}, nil
+	return commonOrderRequest{ID: id}, nil
 }
 
 type errorer interface {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -9,7 +10,9 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/LAtanassov/godax/pkg/accessor"
 	"github.com/LAtanassov/godax/pkg/orders"
+	"github.com/altairsix/eventsource"
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
@@ -19,6 +22,7 @@ import (
 
 const (
 	inmem     = "inmem"
+	mysql     = "mysql"
 	tableName = "orders"
 )
 
@@ -34,13 +38,15 @@ func main() {
 		envTabName   = envString("SQL_DB_NAME", tableName)
 
 		httpAddr = flag.String("http.addr", envHTTPAddr, "HTTP listen address")
-		// TODO: should be a struct
-		sqlDriver = flag.String("sql.driver", envSQLDriver, "SQL driver")
-		sqlUser   = flag.String("sql.user", envSQLUser, "SQL user")
-		sqlPwd    = flag.String("sql.pwd", envSQLPwd, "SQL password")
-		sqlHost   = flag.String("sql.host", envSQLHost, "SQL host")
-		sqlDbName = flag.String("sql.dbname", envSQLDbName, "SQL database name")
-		tableName = flag.String("sql.tabname", envTabName, "Table name")
+
+		dbCon = orders.DatabaseConnection{
+			Driver:   *flag.String("sql.driver", envSQLDriver, "SQL driver"),
+			Username: *flag.String("sql.user", envSQLUser, "SQL user"),
+			Password: *flag.String("sql.pwd", envSQLPwd, "SQL password"),
+			Host:     *flag.String("sql.host", envSQLHost, "SQL host"),
+			Database: *flag.String("sql.dbname", envSQLDbName, "SQL database name"),
+		}
+		tableName = *flag.String("sql.tabname", envTabName, "Table name")
 	)
 
 	flag.Parse()
@@ -48,7 +54,8 @@ func main() {
 	logger := kitlog.NewLogfmtLogger(kitlog.NewSyncWriter(os.Stderr))
 	logger = kitlog.With(logger, "ts", kitlog.DefaultTimestampUTC)
 
-	repo, err := orders.NewRepository(*sqlDriver, *sqlHost, *sqlDbName, *sqlUser, *sqlPwd, *tableName)
+	observers := []func(event eventsource.Event){}
+	repo, err := createRepository(dbCon, tableName, observers...)
 	if err != nil {
 		log.Fatal("terminated: database connection failed ", err)
 	}
@@ -117,6 +124,28 @@ func livenessHandler() http.Handler {
 		w.WriteHeader(200)
 		w.Write([]byte("ok"))
 	})
+}
+
+func createRepository(dbCon orders.DatabaseConnection, tableName string, observers ...func(event eventsource.Event)) (orders.Repository, error) {
+
+	switch dbCon.Driver {
+	case inmem:
+		return orders.NewInMemRepository(observers...), nil
+	case mysql:
+		accessor, err := accessor.New(dbCon.Driver, fmt.Sprintf("%s:%s@tcp(%s)/%s", dbCon.Username, dbCon.Password, dbCon.Host, dbCon.Database), tableName)
+		if err != nil {
+			return nil, err
+		}
+
+		store, err := orders.NewMysqlStore(tableName, accessor)
+		if err != nil {
+			return nil, err
+		}
+
+		return orders.NewRepository(store, observers...), nil
+	default:
+		return nil, errors.New("unsupported driver")
+	}
 }
 
 func envString(env, fallback string) string {

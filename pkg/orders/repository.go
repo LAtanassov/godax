@@ -3,9 +3,7 @@ package orders
 import (
 	"context"
 	"errors"
-	"fmt"
 
-	"github.com/LAtanassov/godax/pkg/accessor"
 	"github.com/LAtanassov/godax/pkg/orderbook"
 	"github.com/altairsix/eventsource"
 	"github.com/altairsix/eventsource/mysqlstore"
@@ -24,36 +22,43 @@ type Repository interface {
 	Load(ctx context.Context, aggregateID string) (eventsource.Aggregate, error)
 }
 
-// NewRepository return a Repository depending on driver (inmem, mysql (defaild))
-func NewRepository(sqlDriver, sqlHost, sqlDbName, sqlUser, sqlPwd, tabName string) (Repository, error) {
-	serializer := eventsource.NewJSONSerializer(
-		orderbook.OrderCreated{},
-		orderbook.OrderCanceled{},
+type DatabaseConnection struct {
+	Driver   string
+	Username string
+	Password string
+	Host     string
+	Database string
+}
+
+var serializer = eventsource.NewJSONSerializer(
+	orderbook.OrderAccepted{},
+	orderbook.OrderCanceled{},
+	orderbook.OrderCleared{},
+	orderbook.OrderConfirmed{},
+	orderbook.OrderCreated{},
+	orderbook.OrderMatched{},
+	orderbook.OrderPublished{},
+	orderbook.OrderSettled{},
+)
+
+// NewInMemRepository return a in memory repository with oberserves
+func NewInMemRepository(observers ...func(event eventsource.Event)) Repository {
+	return eventsource.New(&orderbook.Order{},
+		eventsource.WithSerializer(serializer),
+		eventsource.WithObservers(observers...),
 	)
+}
 
-	if sqlDriver == "inmem" {
-		return eventsource.New(&orderbook.Order{},
-			eventsource.WithSerializer(serializer),
-		), nil
-	}
-
-	if sqlDriver != "mysql" {
-		return nil, ErrUnsupportedDriver
-	}
-
-	acc, err := accessor.New(sqlDriver, fmt.Sprintf("%s:%s@tcp(%s)/%s", sqlUser, sqlPwd, sqlHost, sqlDbName), tabName)
-	if err != nil {
-		return nil, err
-	}
-
-	store, err := mysqlstore.New(tabName, acc)
-	if err != nil {
-		return nil, err
-	}
-
-	repo := eventsource.New(&orderbook.Order{},
+// NewRepository return a repository with oberserves
+func NewRepository(store eventsource.Store, observers ...func(event eventsource.Event)) Repository {
+	return eventsource.New(&orderbook.Order{},
 		eventsource.WithStore(store),
 		eventsource.WithSerializer(serializer),
+		eventsource.WithObservers(observers...),
 	)
-	return repo, nil
+}
+
+// NewMysqlStore return a repository with oberserves
+func NewMysqlStore(tableName string, accessor mysqlstore.Accessor) (eventsource.Store, error) {
+	return mysqlstore.New(tableName, accessor)
 }
