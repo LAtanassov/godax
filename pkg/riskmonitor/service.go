@@ -2,12 +2,10 @@ package riskmonitor
 
 import (
 	"context"
-
-	"github.com/LAtanassov/godax/pkg/orderbook"
 )
 
+// Service accepts or rejects orders either by automation or by a decision of a risk analyst.
 type Service interface {
-	GetOrderCreated(ctx context.Context) ([]orderbook.OrderCreated, error)
 	// AcceptOrder accepts an existing Order
 	AcceptOrder(ctx context.Context, id string) error
 	// RejectOrder rejects an existing Order
