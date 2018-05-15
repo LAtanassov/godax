@@ -2,7 +2,7 @@
 
 #curl https://glide.sh/get | sh
 
-glide update
+#glide update
 GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/) # All the .go files, excluding vendor/
 go get github.com/golang/lint/golint                        # Linter
 go get honnef.co/go/tools/cmd/megacheck                     # Badass static analyzer/linter

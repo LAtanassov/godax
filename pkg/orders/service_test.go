@@ -24,7 +24,7 @@ func Test_service_CreateOrder(t *testing.T) {
 	}{
 		{"should apply CreateOrder command to repository",
 			fields{&mockIDGenerator{id: "AB-CD"}, &mockRepository{wantErr: false, err: nil,
-				command: orderbook.CreateOrder{1.0, 1.0, orderbook.Limit, orderbook.Buy, orderbook.BtcUsd, eventsource.CommandModel{ID: "AB-CD"}}}},
+				command: orderbook.CreateOrder{Size: 1.0, Price: 1.0, OrderType: orderbook.Limit, OrderSide: orderbook.Buy, ProductID: orderbook.BtcUsd, CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
 			context.Background(), "AB-CD", false},
 
 		{"should return error when the repository returns so",
@@ -69,7 +69,7 @@ func Test_service_GetOrder(t *testing.T) {
 	}{
 		{"should get order by id",
 			fields{idGenerator: nil, repository: &mockRepository{wantErr: false, err: nil, aggregate: &testOrder,
-				command: orderbook.CreateOrder{1.0, 1.0, orderbook.Limit, orderbook.Buy, orderbook.BtcUsd, eventsource.CommandModel{ID: "AB-CD"}}}},
+				command: orderbook.CreateOrder{Size: 1.0, Price: 1.0, OrderType: orderbook.Limit, OrderSide: orderbook.Buy, ProductID: orderbook.BtcUsd, CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
 			args{context.Background(), "AB-CD"}, testOrder, false},
 		{"should return error when the repository returns so",
 			fields{idGenerator: nil, repository: &mockRepository{wantErr: true, err: errors.New(""), aggregate: &testOrder}},
@@ -115,7 +115,8 @@ func Test_service_CancelOrder(t *testing.T) {
 	}{
 		{"should apply CancelOrder command to repository",
 			fields{nil, &mockRepository{wantErr: false, err: nil,
-				command: orderbook.CreateOrder{1.0, 1.0, orderbook.Limit, orderbook.Buy, orderbook.BtcUsd, eventsource.CommandModel{ID: "AB-CD"}}}},
+				command: orderbook.CreateOrder{
+					Size: 1.0, Price: 1.0, OrderType: orderbook.Limit, OrderSide: orderbook.Buy, ProductID: orderbook.BtcUsd, CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
 			context.Background(), "AB-CD", false},
 
 		{"should return error when the repository returns so",
@@ -152,7 +153,7 @@ func Test_service_AcceptOrder(t *testing.T) {
 	}{
 		{"should apply AcceptOrder command to repository",
 			fields{nil, &mockRepository{wantErr: false, err: nil,
-				command: orderbook.AcceptOrder{eventsource.CommandModel{ID: "AB-CD"}}}},
+				command: orderbook.AcceptOrder{CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
 			context.Background(), "AB-CD", false},
 
 		{"should return error when the repository returns so",
@@ -189,7 +190,7 @@ func Test_service_PublishOrder(t *testing.T) {
 	}{
 		{"should apply PublishOrder command to repository",
 			fields{nil, &mockRepository{wantErr: false, err: nil,
-				command: orderbook.PublishOrder{eventsource.CommandModel{ID: "AB-CD"}}}},
+				command: orderbook.PublishOrder{CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
 			context.Background(), "AB-CD", false},
 
 		{"should return error when the repository returns so",
@@ -226,7 +227,7 @@ func Test_service_MatchOrder(t *testing.T) {
 	}{
 		{"should apply MatchOrder command to repository",
 			fields{nil, &mockRepository{wantErr: false, err: nil,
-				command: orderbook.MatchOrder{eventsource.CommandModel{ID: "AB-CD"}}}},
+				command: orderbook.MatchOrder{CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
 			context.Background(), "AB-CD", false},
 
 		{"should return error when the repository returns so",
@@ -263,7 +264,7 @@ func Test_service_ConfirmOrder(t *testing.T) {
 	}{
 		{"should apply ConfirmOrder command to repository",
 			fields{nil, &mockRepository{wantErr: false, err: nil,
-				command: orderbook.ConfirmOrder{eventsource.CommandModel{ID: "AB-CD"}}}},
+				command: orderbook.ConfirmOrder{CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
 			context.Background(), "AB-CD", false},
 
 		{"should return error when the repository returns so",
@@ -300,7 +301,7 @@ func Test_service_ClearOrder(t *testing.T) {
 	}{
 		{"should apply ClearOrder command to repository",
 			fields{nil, &mockRepository{wantErr: false, err: nil,
-				command: orderbook.ClearOrder{eventsource.CommandModel{ID: "AB-CD"}}}},
+				command: orderbook.ClearOrder{CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
 			context.Background(), "AB-CD", false},
 
 		{"should return error when the repository returns so",
@@ -337,7 +338,7 @@ func Test_service_SettleOrder(t *testing.T) {
 	}{
 		{"should apply SettleOrder command to repository",
 			fields{nil, &mockRepository{wantErr: false, err: nil,
-				command: orderbook.SettleOrder{eventsource.CommandModel{ID: "AB-CD"}}}},
+				command: orderbook.SettleOrder{CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
 			context.Background(), "AB-CD", false},
 
 		{"should return error when the repository returns so",

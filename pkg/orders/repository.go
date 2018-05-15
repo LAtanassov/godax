@@ -22,6 +22,7 @@ type Repository interface {
 	Load(ctx context.Context, aggregateID string) (eventsource.Aggregate, error)
 }
 
+// DatabaseConnection contains all fields to establish a database connection
 type DatabaseConnection struct {
 	Driver   string
 	Username string
