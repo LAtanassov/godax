@@ -5,13 +5,32 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/LAtanassov/godax/pkg/orderbook"
+	"github.com/go-kit/kit/circuitbreaker"
+	"github.com/go-kit/kit/endpoint"
 	kitlog "github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/ratelimit"
 	kithttp "github.com/go-kit/kit/transport/http"
+	"golang.org/x/time/rate"
 
 	"github.com/gorilla/mux"
 )
+
+// circuit breaker and rate limit does not belong here
+// rate limit per IP adress would be better
+func newCircuitBreakerMiddleware(commandName string) endpoint.Middleware {
+	return func(next endpoint.Endpoint) endpoint.Endpoint {
+		return circuitbreaker.Hystrix(commandName)(next)
+	}
+}
+
+func newRatelimitMiddleware(limit ratelimit.Allower) endpoint.Middleware {
+	return func(next endpoint.Endpoint) endpoint.Endpoint {
+		return ratelimit.NewErroringLimiter(limit)(next)
+	}
+}
 
 // MakeHandler returns a handler for the order service.
 func MakeHandler(s Service, logger kitlog.Logger) http.Handler {
@@ -20,15 +39,21 @@ func MakeHandler(s Service, logger kitlog.Logger) http.Handler {
 		kithttp.ServerErrorEncoder(encodeError),
 	}
 
+	c := makeCreateOrderEndpoint(s)
+	c = newCircuitBreakerMiddleware("create order")(c)
+	c = newRatelimitMiddleware(rate.NewLimiter(rate.Every(time.Second), 100))(c)
 	createOrderHandler := kithttp.NewServer(
-		makeCreateOrderEndpoint(s),
+		c,
 		decodeCreateOrderRequest,
 		encodeResponse,
 		opts...,
 	)
 
+	g := makeGetOrderEndpoint(s)
+	g = newCircuitBreakerMiddleware("get order")(g)
+	g = newRatelimitMiddleware(rate.NewLimiter(rate.Every(time.Second), 100))(g)
 	getOrderHandler := kithttp.NewServer(
-		makeGetOrderEndpoint(s),
+		g,
 		decodeGetOrderRequest,
 		encodeResponse,
 		opts...,

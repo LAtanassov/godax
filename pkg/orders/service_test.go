@@ -24,7 +24,8 @@ func Test_service_CreateOrder(t *testing.T) {
 	}{
 		{"should apply CreateOrder command to repository",
 			fields{&mockIDGenerator{id: "AB-CD"}, &mockRepository{wantErr: false, err: nil,
-				command: orderbook.CreateOrder{Size: 1.0, Price: 1.0, OrderType: orderbook.Limit, OrderSide: orderbook.Buy, ProductID: orderbook.BtcUsd, CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
+				command: orderbook.CreateOrder{Size: 1.0, Price: 1.0, OrderType: orderbook.Limit, OrderSide: orderbook.Buy,
+					ProductID: orderbook.BtcUsd, CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
 			context.Background(), "AB-CD", false},
 
 		{"should return error when the repository returns so",
@@ -69,7 +70,8 @@ func Test_service_GetOrder(t *testing.T) {
 	}{
 		{"should get order by id",
 			fields{idGenerator: nil, repository: &mockRepository{wantErr: false, err: nil, aggregate: &testOrder,
-				command: orderbook.CreateOrder{Size: 1.0, Price: 1.0, OrderType: orderbook.Limit, OrderSide: orderbook.Buy, ProductID: orderbook.BtcUsd, CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
+				command: orderbook.CreateOrder{Size: 1.0, Price: 1.0, OrderType: orderbook.Limit, OrderSide: orderbook.Buy,
+					ProductID: orderbook.BtcUsd, CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
 			args{context.Background(), "AB-CD"}, testOrder, false},
 		{"should return error when the repository returns so",
 			fields{idGenerator: nil, repository: &mockRepository{wantErr: true, err: errors.New(""), aggregate: &testOrder}},
@@ -115,8 +117,8 @@ func Test_service_CancelOrder(t *testing.T) {
 	}{
 		{"should apply CancelOrder command to repository",
 			fields{nil, &mockRepository{wantErr: false, err: nil,
-				command: orderbook.CreateOrder{
-					Size: 1.0, Price: 1.0, OrderType: orderbook.Limit, OrderSide: orderbook.Buy, ProductID: orderbook.BtcUsd, CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
+				command: orderbook.CreateOrder{Size: 1.0, Price: 1.0, OrderType: orderbook.Limit, OrderSide: orderbook.Buy,
+					ProductID: orderbook.BtcUsd, CommandModel: eventsource.CommandModel{ID: "AB-CD"}}}},
 			context.Background(), "AB-CD", false},
 
 		{"should return error when the repository returns so",

@@ -23,6 +23,9 @@ func Test_main_create(t *testing.T) {
 		{Name: "should return Bad Request (400) for invalid body", Method: "POST", URL: "http://localhost:8080/godax/v1/orders",
 			Order:      orderRequest{},
 			StatusCode: http.StatusBadRequest},
+
+		// should get an order
+		// should return Not Found (404) if order does not exists
 	}
 	for _, tt := range tests {
 		t.Run(tt.Name, func(t *testing.T) {
