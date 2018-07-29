@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/LAtanassov/godax/pkg/accessor"
 	"github.com/LAtanassov/godax/pkg/orderbook"
 	"github.com/altairsix/eventsource"
 	"github.com/altairsix/eventsource/mysqlstore"
@@ -42,16 +43,41 @@ var serializer = eventsource.NewJSONSerializer(
 	orderbook.OrderSettled{},
 )
 
-// NewInMemRepository return a in memory repository with oberserves
-func NewInMemRepository(observers ...func(event eventsource.Event)) Repository {
+const (
+	inmem = "inmem"
+	mysql = "mysql"
+)
+
+// NewRepository return a repository depending on driver
+func NewRepository(dbDriver, dbURL, tableName string) (Repository, error) {
+
+	switch dbDriver {
+	case inmem:
+		return newInMemRepository(), nil
+	case mysql:
+		accessor, err := accessor.New(dbDriver, dbURL, tableName)
+		if err != nil {
+			return nil, err
+		}
+		store, err := newMysqlStore(tableName, accessor)
+		if err != nil {
+			return nil, err
+		}
+
+		return newRepository(store), nil
+	default:
+		return nil, ErrUnsupportedDriver
+	}
+}
+
+func newInMemRepository(observers ...func(event eventsource.Event)) Repository {
 	return eventsource.New(&orderbook.Order{},
 		eventsource.WithSerializer(serializer),
 		eventsource.WithObservers(observers...),
 	)
 }
 
-// NewRepository return a repository with oberserves
-func NewRepository(store eventsource.Store, observers ...func(event eventsource.Event)) Repository {
+func newRepository(store eventsource.Store, observers ...func(event eventsource.Event)) Repository {
 	return eventsource.New(&orderbook.Order{},
 		eventsource.WithStore(store),
 		eventsource.WithSerializer(serializer),
@@ -60,6 +86,6 @@ func NewRepository(store eventsource.Store, observers ...func(event eventsource.
 }
 
 // NewMysqlStore return a repository with oberserves
-func NewMysqlStore(tableName string, accessor mysqlstore.Accessor) (eventsource.Store, error) {
+func newMysqlStore(tableName string, accessor mysqlstore.Accessor) (eventsource.Store, error) {
 	return mysqlstore.New(tableName, accessor)
 }
