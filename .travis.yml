@@ -8,7 +8,7 @@ go:
 # set -e enabled in bash. 
 before_script:
   - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/) # All the .go files, excluding vendor/
-  - GO_FOLDERS = $(go list ./... | grep LAtanassov)
+  - GO_FOLDERS=$(go list ./... | grep LAtanassov)
   - go get golang.org/x/vgo
   - go get github.com/golang/lint/golint                        # Linter
   - go get honnef.co/go/tools/cmd/megacheck                     # Badass static analyzer/linter
