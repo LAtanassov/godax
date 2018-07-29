@@ -18,7 +18,7 @@ before_script:
 script:
   - test -z $(vgo fmt ./...)                 # Fail if a .go file hasn't been formatted with gofmt
   - vgo test -v -race ./...                  # Run all the tests with the race detector enabled
-  - vgo vet ./...                            # go vet is the official Go static analyzer
+  - vgo vet $(go list ./...)                 # go vet is the official Go static analyzer
   - vgo mod -vendor
   - megacheck ./...                          # "go vet on steroids" + linter
   - gocyclo -over 19 $GO_FILES               # forbid code with huge functions
