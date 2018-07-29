@@ -11,6 +11,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// ErrTypeCast if returned when the expected type does not match
+var ErrTypeCast = errors.New("type cast failed")
+
 // New return a MySQL accessor and creates a table if not exists
 func New(driver, dsn, tableName string) (mysqlstore.Accessor, error) {
 	db, err := sql.Open(driver, dsn)
@@ -55,11 +58,11 @@ func (a *accessor) Open(ctx context.Context) (mysqlstore.DB, error) {
 	return db, nil
 }
 
-// Close the database.
+// Close the database
 func (a *accessor) Close(db mysqlstore.DB) error {
 	d, ok := db.(*sql.DB)
 	if !ok {
-		return errors.New("type cast failed")
+		return ErrTypeCast
 	}
 	return d.Close()
 }
