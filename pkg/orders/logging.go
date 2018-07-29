@@ -14,9 +14,11 @@ type loggingService struct {
 	Service
 }
 
-// NewLoggingService returns a new instance of a logging Service.
-func NewLoggingService(logger log.Logger, s Service) Service {
-	return &loggingService{logger, s}
+// NewLoggingMiddleware returns a new instance of a logging middleware.
+func NewLoggingMiddleware(logger log.Logger) ServiceMiddleware {
+	return func(next Service) Service {
+		return &loggingService{logger, next}
+	}
 }
 
 func (s *loggingService) CreateOrder(ctx context.Context, size, price float32,

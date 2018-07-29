@@ -1,6 +1,12 @@
 hash: 6bf632d746e215bec6f446e5f5cdd169ddbf40dc638bdfaa8c39c30e0c968d13
-updated: 2018-05-06T18:10:40.355310085+02:00
+updated: 2018-05-11T13:51:31.193773241+02:00
 imports:
+- name: github.com/afex/hystrix-go
+  version: fa1af6a1f4f56e0e50d427fe901cd604d8c6fb8a
+  subpackages:
+  - hystrix
+  - hystrix/metric_collector
+  - hystrix/rolling
 - name: github.com/altairsix/eventsource
   version: 7b6859b7a00908296beea99d5d2800b6c071c084
   subpackages:
@@ -10,13 +16,15 @@ imports:
   subpackages:
   - quantile
 - name: github.com/go-kit/kit
-  version: 828ac175f5d2a008e9eea3a36f474f19a774a3a3
+  version: 1b1a55c53e898557056c7f3fe05be3760a48f172
   subpackages:
+  - circuitbreaker
   - endpoint
   - log
   - metrics
   - metrics/internal/lv
   - metrics/prometheus
+  - ratelimit
   - transport/http
 - name: github.com/go-logfmt/logfmt
   version: 390ab7935ee28ec6b286364bba9b4dd6410cb3d5
@@ -63,6 +71,22 @@ imports:
   - internal/util
   - nfs
   - xfs
+- name: github.com/sony/gobreaker
+  version: 3cb67c77c1d1e72fda30c6970578164d24f806b6
+- name: github.com/streadway/amqp
+  version: 8e4aba63da9fc5571e01c6a45dc809a58cbc5a68
+- name: github.com/streadway/handy
+  version: f450267a206e480d863d2a92846a40f6e2896b2a
+  subpackages:
+  - breaker
+- name: golang.org/x/net
+  version: f73e4c9ed3b7ebdd5f699a16a880c2b1994e50dd
+  subpackages:
+  - context
+- name: golang.org/x/time
+  version: fbb02b2291d28baffd63558aa44b4b56f178d650
+  subpackages:
+  - rate
 - name: google.golang.org/appengine
   version: 962cbd1200af94a5a35ba8d512e9f91271b4d01a
   subpackages:

@@ -64,8 +64,8 @@ func main() {
 	fieldKeys := []string{"method"}
 
 	o := orders.NewService(idg, repo)
-	o = orders.NewLoggingService(kitlog.With(logger, "component", "orders"), o)
-	o = orders.NewInstrumentingService(
+	o = orders.NewLoggingMiddleware(kitlog.With(logger, "component", "orders"))(o)
+	o = orders.NewInstrumentingMiddleware(
 		kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
 			Namespace: "api",
 			Subsystem: "orders_service",
@@ -77,9 +77,7 @@ func main() {
 			Subsystem: "orders_service",
 			Name:      "request_latency_microseconds",
 			Help:      "Total duration of requests in microseconds.",
-		}, fieldKeys),
-		o,
-	)
+		}, fieldKeys))(o)
 
 	httpLogger := kitlog.With(logger, "component", "http")
 

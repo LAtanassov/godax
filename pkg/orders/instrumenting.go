@@ -15,12 +15,14 @@ type instrumentingService struct {
 	Service
 }
 
-// NewInstrumentingService returns an instance of the instrumented Service.
-func NewInstrumentingService(counter metrics.Counter, latency metrics.Histogram, s Service) Service {
-	return &instrumentingService{
-		requestCount:   counter,
-		requestLatency: latency,
-		Service:        s,
+// NewInstrumentingMiddleware returns an instance of the instrumented middleware.
+func NewInstrumentingMiddleware(counter metrics.Counter, latency metrics.Histogram) ServiceMiddleware {
+	return func(next Service) Service {
+		return &instrumentingService{
+			requestCount:   counter,
+			requestLatency: latency,
+			Service:        next,
+		}
 	}
 }
 

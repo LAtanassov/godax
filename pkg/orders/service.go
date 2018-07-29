@@ -37,6 +37,9 @@ type Service interface {
 	SettleOrder(ctx context.Context, id string) error
 }
 
+// ServiceMiddleware is a chainable behavior modifier for Service.
+type ServiceMiddleware func(Service) Service
+
 type service struct {
 	idGenerator Generator
 	repository  Repository
