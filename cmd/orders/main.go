@@ -90,12 +90,13 @@ func main() {
 
 	// gracefully shutdown
 	err = <-errs
-	log.Println("recv. signal", err)
+	logger.Log("shutdown", "http_server", "signal_recv", err)
 	if err := srv.Shutdown(context.Background()); err != nil {
-		logger.Log(err)
+		logger.Log("shutdown", "http_server", "err", err)
 	}
-	log.Println("terminate in 5 sec")
+	logger.Log("shutdown", "cooldown_5_sec")
 	time.Sleep(time.Duration(5) * time.Second)
+	logger.Log("shutdown", "byebye")
 	os.Exit(1)
 }
 
