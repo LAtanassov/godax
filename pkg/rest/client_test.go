@@ -10,14 +10,14 @@ import (
 )
 
 type TestData struct {
-	id int
+	ID int `json:"id"`
 }
 
 func Test_client_NewRequest(t *testing.T) {
 
 	type args struct {
 		method string
-		path   string
+		path   *url.URL
 		body   interface{}
 	}
 	tests := []struct {
@@ -26,20 +26,22 @@ func Test_client_NewRequest(t *testing.T) {
 		want    *TestData
 		wantErr bool
 	}{
-		{"should GET TestData", args{"GET", "/", nil}, &TestData{id: 1}, false},
+		{"should GET TestData", args{"GET", &url.URL{Path: "/test"}, nil}, &TestData{ID: 1}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				json.NewEncoder(w).Encode(&TestData{id: 1})
+				w.Header().Set("Content-Type", "application/json; charset=utf-8")
+				json.NewEncoder(w).Encode(&TestData{ID: 1})
 			}))
 			defer ts.Close()
-
-			c := &client{
-				BaseURL:    &url.URL{Path: ts.URL},
-				UserAgent:  "Mozilla",
-				httpClient: http.DefaultClient,
+			u, err := url.Parse(ts.URL)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.NewRequest() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
+			c := NewClient(nil, u)
+
 			r, err := c.NewRequest(tt.args.method, tt.args.path, tt.args.body)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("client.NewRequest() error = %v, wantErr %v", err, tt.wantErr)

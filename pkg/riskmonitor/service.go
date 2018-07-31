@@ -21,13 +21,15 @@ type Service interface {
 type ServiceMiddleware func(Service) Service
 
 type service struct {
-	client orders.Client
+	client     orders.Client
+	repository Repository
 }
 
 // NewService creates a booking service with necessary dependencies.
-func NewService(c orders.Client) Service {
+func NewService(c orders.Client, r Repository) Service {
 	return &service{
-		client: c,
+		client:     c,
+		repository: r,
 	}
 }
 
@@ -40,5 +42,5 @@ func (s *service) RejectOrder(ctx context.Context, id string) error {
 }
 
 func (s *service) GetPendingOrders() ([]orderbook.Order, error) {
-	return nil, nil
+	return s.repository.GetPendingOrders()
 }
