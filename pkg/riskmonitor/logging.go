@@ -1,12 +1,12 @@
-package orders
+package riskmonitor
 
 import (
 	"context"
 	"time"
 
-	"github.com/LAtanassov/godax/pkg/orderbook"
-
 	"github.com/go-kit/kit/log"
+
+	"github.com/LAtanassov/godax/pkg/orderbook"
 )
 
 type loggingService struct {
@@ -21,42 +21,41 @@ func NewLoggingMiddleware(logger log.Logger) ServiceMiddleware {
 	}
 }
 
-func (s *loggingService) CreateOrder(ctx context.Context, size, price float32,
-	orderType orderbook.OrderType, orderSide orderbook.OrderSide, productID orderbook.ProductID) (id string, err error) {
+func (s *loggingService) AcceptOrder(ctx context.Context, id string) (err error) {
 	defer func(begin time.Time) {
 		s.logger.Log(
-			"method", "CreateOrder",
+			"method", "AcceptOrder",
 			"id", id,
 			"took", time.Since(begin),
 			"err", err,
 		)
 	}(time.Now())
 
-	return s.Service.CreateOrder(ctx, size, price, orderType, orderSide, productID)
+	return s.Service.AcceptOrder(ctx, id)
 }
 
-func (s *loggingService) GetOrder(ctx context.Context, id string) (order orderbook.Order, err error) {
+func (s *loggingService) RejectOrder(ctx context.Context, id string) (err error) {
 	defer func(begin time.Time) {
 		s.logger.Log(
-			"method", "GetOrder",
+			"method", "RejectOrder",
 			"id", id,
 			"took", time.Since(begin),
 			"err", err,
 		)
 	}(time.Now())
 
-	return s.Service.GetOrder(ctx, id)
+	return s.Service.RejectOrder(ctx, id)
 }
 
-func (s *loggingService) CancelOrder(ctx context.Context, id string) (err error) {
+func (s *loggingService) GetPendingOrders() (orders []orderbook.Order, err error) {
 	defer func(begin time.Time) {
 		s.logger.Log(
-			"method", "CancelOrder",
-			"id", id,
+			"method", "GetPendingOrders",
+			"ordersLength", len(orders),
 			"took", time.Since(begin),
 			"err", err,
 		)
 	}(time.Now())
 
-	return s.Service.CancelOrder(ctx, id)
+	return s.Service.GetPendingOrders()
 }
