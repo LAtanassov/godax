@@ -39,3 +39,4 @@ $> docker run -it -p 5672:5672 --hostname test-rabbitmq rabbitmq:3.7.4
 * put all events on kafka (kubernetes deployment)
 * consider use of kubeless (event driven) vs microservice - CreateOrder, ApproveOrder Command
 * use workbox to create PWA frontend 
+
