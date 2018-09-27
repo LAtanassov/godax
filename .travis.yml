@@ -1,19 +1,17 @@
 # Original .travis.yml from https://gist.github.com/y0ssar1an/df2dab474520c4086926f672c52db139
 language: go
 go:
-  - 1.10.x
+  - 1.11.x
 
 before_script:
   - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/)
-  - go get golang.org/x/vgo
   - go get github.com/golang/lint/golint
   - go get honnef.co/go/tools/cmd/megacheck
   - go get github.com/fzipp/gocyclo
 
 script:
-  - test -z $(vgo fmt ./...)
-  - vgo test -v -race ./...
-  - vgo mod -vendor
+  - test -z $(go fmt ./...)
+  - go test -v -race ./...
   - megacheck ./...
   - gocyclo -over 19 $GO_FILES
   - golint -set_exit_status $(go list ./...)
