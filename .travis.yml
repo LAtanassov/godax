@@ -12,7 +12,6 @@ before_script:
 script:
   - test -z $(go fmt ./...)
   - go test -v -race ./...
-  - go mod -vendor
   - megacheck ./...
   - gocyclo -over 19 $GO_FILES
   - golint -set_exit_status $(go list ./...)
