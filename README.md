@@ -34,6 +34,13 @@ $> docker run -it -p 5672:5672 --hostname test-rabbitmq rabbitmq:3.7.4
 * FEATURE: not fault-tolerant yet (observers might miss a message)
 * FEATURE: publisher/consumer - exponetial backoff reconnect, reuse channel
 
+
 ## Useful Links
 
 value vs. pointer: https://www.ardanlabs.com/blog/2014/12/using-pointers-in-go.html
+
+## REFACTORING
+
+* put all events on kafka (kubernetes deployment)
+* consider use of kubeless (event driven) vs microservice - CreateOrder, ApproveOrder Command
+* use workbox to create PWA frontend 
