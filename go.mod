@@ -1,35 +1,24 @@
 module github.com/LAtanassov/godax
 
 require (
-	github.com/VividCortex/gohistogram v1.0.0
-	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
+	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5 // indirect
 	github.com/altairsix/eventsource v0.0.0-20170815104732-7b6859b7a009
-	github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973
+	github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973 // indirect
 	github.com/go-kit/kit v0.7.0
-	github.com/go-logfmt/logfmt v0.3.0
+	github.com/go-logfmt/logfmt v0.3.0 // indirect
 	github.com/go-sql-driver/mysql v1.4.0
-	github.com/go-stack/stack v1.7.0
-	github.com/golang/protobuf v1.1.0
-	github.com/gopherjs/gopherjs v0.0.0-20180628210949-0892b62f0d9f
-	github.com/gorilla/context v1.1.1
+	github.com/go-stack/stack v1.8.0 // indirect
+	github.com/golang/protobuf v1.2.0 // indirect
 	github.com/gorilla/mux v1.6.2
-	github.com/gorilla/websocket v1.2.0
-	github.com/jtolds/gls v0.0.0-20170503224851-77f18212c9c7
-	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515
-	github.com/matttproud/golang_protobuf_extensions v1.0.1
-	github.com/pkg/errors v0.8.0
-	github.com/prometheus/client_golang v0.9.0-pre1
-	github.com/prometheus/client_model v0.0.0-20180712105110-5c3871d89910
-	github.com/prometheus/common v0.0.0-20180518154759-7600349dcfe1
-	github.com/prometheus/procfs v0.0.0-20180725123919-05ee40e3a273
-	github.com/smartystreets/assertions v0.0.0-20180725160413-e900ae048470
-	github.com/smartystreets/goconvey v0.0.0-20180222194500-ef6db91d284a
-	github.com/sony/gobreaker v0.0.0-20171108100924-3cb67c77c1d1
-	github.com/streadway/amqp v0.0.0-20180528204448-e5adc2ada8b8
-	github.com/streadway/handy v0.0.0-20160402200321-f450267a206e
-	github.com/stretchr/testify v1.2.2
-	golang.org/x/net v0.0.0-20180724234803-3673e40ba225
-	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f
+	github.com/gorilla/websocket v1.4.0
+	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
+	github.com/pkg/errors v0.8.0 // indirect
+	github.com/prometheus/client_golang v0.8.0
+	github.com/prometheus/client_model v0.0.0-20180712105110-5c3871d89910 // indirect
+	github.com/prometheus/common v0.0.0-20180801064454-c7de2306084e // indirect
+	github.com/prometheus/procfs v0.0.0-20180920065004-418d78d0b9a7 // indirect
+	github.com/sony/gobreaker v0.0.0-20180905101324-b2a34562d02c // indirect
+	github.com/streadway/amqp v0.0.0-20180806233856-70e15c650864
+	github.com/streadway/handy v0.0.0-20160402200321-f450267a206e // indirect
 	golang.org/x/time v0.0.0-20180412165947-fbb02b2291d2
-	google.golang.org/appengine v1.1.0
 )
